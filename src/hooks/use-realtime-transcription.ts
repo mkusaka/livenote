@@ -20,7 +20,7 @@ interface UseRealtimeTranscriptionReturn {
   clearTranscript: () => void;
 }
 
-const REALTIME_URL = "wss://api.openai.com/v1/realtime?intent=transcription";
+const REALTIME_URL = "wss://api.openai.com/v1/realtime?model=gpt-4o-mini-realtime-preview";
 const SAMPLE_RATE = 24000;
 
 export function useRealtimeTranscription(): UseRealtimeTranscriptionReturn {
@@ -87,11 +87,12 @@ export function useRealtimeTranscription(): UseRealtimeTranscriptionReturn {
         // Configure the session for transcription
         ws.send(
           JSON.stringify({
-            type: "transcription_session.update",
+            type: "session.update",
             session: {
+              modalities: ["text", "audio"],
               input_audio_format: "pcm16",
               input_audio_transcription: {
-                model: "gpt-4o-mini-transcribe",
+                model: "whisper-1",
                 language: "ja",
               },
               turn_detection: {
@@ -176,6 +177,8 @@ export function useRealtimeTranscription(): UseRealtimeTranscriptionReturn {
           case "error":
             console.error("Realtime API error:", message.error);
             setError(message.error?.message || "Unknown error");
+            setState("error");
+            cleanup();
             break;
         }
       };
@@ -188,9 +191,13 @@ export function useRealtimeTranscription(): UseRealtimeTranscriptionReturn {
       };
 
       ws.onclose = () => {
-        if (state === "recording") {
-          setState("idle");
-        }
+        // Clean up resources when WebSocket closes
+        cleanup();
+        setState((currentState) =>
+          currentState === "recording" || currentState === "connected" || currentState === "connecting"
+            ? "idle"
+            : currentState
+        );
       };
     } catch (err) {
       console.error("Error starting realtime transcription:", err);

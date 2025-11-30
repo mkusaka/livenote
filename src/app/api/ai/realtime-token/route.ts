@@ -15,8 +15,7 @@ export async function POST() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini-transcribe",
-          voice: "alloy",
+          model: "gpt-4o-mini-realtime-preview",
         }),
       }
     );
