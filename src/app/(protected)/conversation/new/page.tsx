@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { RealtimeTranscriptionRecorder } from "@/components/realtime-transcription-recorder";
 import { GoogleSpeechRecorder } from "@/components/google-speech-recorder";
+import { AmiVoiceRecorder } from "@/components/amivoice-recorder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
-type SpeechProvider = "openai" | "google";
+type SpeechProvider = "openai" | "google" | "amivoice";
 
 interface ExtractedTopic {
   title: string;
@@ -33,7 +34,7 @@ export default function NewConversationPage() {
     null
   );
   const [isExtracting, setIsExtracting] = useState(false);
-  const [provider, setProvider] = useState<SpeechProvider>("google");
+  const [provider, setProvider] = useState<SpeechProvider>("amivoice");
 
   const handleExtractTopics = async () => {
     if (!transcript) return;
@@ -78,6 +79,7 @@ export default function NewConversationPage() {
               <SelectValue placeholder="音声認識プロバイダー" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="amivoice">AmiVoice</SelectItem>
               <SelectItem value="google">Google Cloud Speech-to-Text</SelectItem>
               <SelectItem value="openai">OpenAI Realtime API</SelectItem>
             </SelectContent>
@@ -86,7 +88,9 @@ export default function NewConversationPage() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-6">
-            {provider === "google" ? (
+            {provider === "amivoice" ? (
+              <AmiVoiceRecorder onTranscriptChange={setTranscript} />
+            ) : provider === "google" ? (
               <GoogleSpeechRecorder onTranscriptChange={setTranscript} />
             ) : (
               <RealtimeTranscriptionRecorder onTranscriptChange={setTranscript} />
