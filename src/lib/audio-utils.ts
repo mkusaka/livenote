@@ -70,3 +70,20 @@ export function processAudioForRealtime(
   // Convert to base64
   return int16ToBase64(int16);
 }
+
+/**
+ * Process audio buffer for Google Cloud Speech-to-Text
+ * Converts browser audio (Float32, 48kHz) to Google format (Int16 PCM, 16kHz, base64)
+ */
+export function processAudioForGoogleSpeech(
+  audioData: Float32Array,
+  sourceSampleRate: number = 48000,
+  targetSampleRate: number = 16000
+): string {
+  // Downsample to target rate
+  const downsampled = downsample(audioData, sourceSampleRate, targetSampleRate);
+  // Convert to Int16 PCM
+  const int16 = float32ToInt16(downsampled);
+  // Convert to base64
+  return int16ToBase64(int16);
+}

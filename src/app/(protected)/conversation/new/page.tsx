@@ -3,9 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { RealtimeTranscriptionRecorder } from "@/components/realtime-transcription-recorder";
+import { GoogleSpeechRecorder } from "@/components/google-speech-recorder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowLeft, Sparkles } from "lucide-react";
+
+type SpeechProvider = "openai" | "google";
 
 interface ExtractedTopic {
   title: string;
@@ -23,6 +33,7 @@ export default function NewConversationPage() {
     null
   );
   const [isExtracting, setIsExtracting] = useState(false);
+  const [provider, setProvider] = useState<SpeechProvider>("google");
 
   const handleExtractTopics = async () => {
     if (!transcript) return;
@@ -58,9 +69,28 @@ export default function NewConversationPage() {
           <h1 className="text-2xl font-bold">New Conversation</h1>
         </div>
 
+        <div className="mb-4">
+          <Select
+            value={provider}
+            onValueChange={(value: SpeechProvider) => setProvider(value)}
+          >
+            <SelectTrigger className="w-[280px]">
+              <SelectValue placeholder="音声認識プロバイダー" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="google">Google Cloud Speech-to-Text</SelectItem>
+              <SelectItem value="openai">OpenAI Realtime API</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-6">
-            <RealtimeTranscriptionRecorder onTranscriptChange={setTranscript} />
+            {provider === "google" ? (
+              <GoogleSpeechRecorder onTranscriptChange={setTranscript} />
+            ) : (
+              <RealtimeTranscriptionRecorder onTranscriptChange={setTranscript} />
+            )}
 
             {transcript && (
               <Button
