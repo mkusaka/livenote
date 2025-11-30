@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useTranscription } from "@/hooks/use-transcription";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,14 +26,12 @@ export function TranscriptionRecorder({
     clearTranscript,
   } = useTranscription();
 
-  const handleTranscriptChange = (newTranscript: string) => {
-    onTranscriptChange?.(newTranscript);
-  };
-
   // Notify parent when transcript changes
-  if (transcript && onTranscriptChange) {
-    handleTranscriptChange(transcript);
-  }
+  useEffect(() => {
+    if (transcript) {
+      onTranscriptChange?.(transcript);
+    }
+  }, [transcript, onTranscriptChange]);
 
   return (
     <Card>

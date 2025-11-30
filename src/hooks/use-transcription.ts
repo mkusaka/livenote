@@ -33,12 +33,22 @@ export function useTranscription(): UseTranscriptionReturn {
   );
 
   const transcribeAudio = useCallback(async (audioBlob: Blob) => {
+    // Skip empty blobs
+    if (audioBlob.size === 0) {
+      return;
+    }
+
     setIsProcessing(true);
     setTranscriptionError(null);
 
     try {
+      // Create a proper File object with correct MIME type
+      const audioFile = new File([audioBlob], "recording.webm", {
+        type: "audio/webm",
+      });
+
       const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
+      formData.append("audio", audioFile);
 
       const response = await fetch("/api/ai/transcribe", {
         method: "POST",

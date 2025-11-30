@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { TranscriptionRecorder } from "@/components/transcription-recorder";
+import { RealtimeTranscriptionRecorder } from "@/components/realtime-transcription-recorder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Sparkles } from "lucide-react";
@@ -60,7 +60,7 @@ export default function NewConversationPage() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-6">
-            <TranscriptionRecorder onTranscriptChange={setTranscript} />
+            <RealtimeTranscriptionRecorder onTranscriptChange={setTranscript} />
 
             {transcript && (
               <Button
