@@ -1,8 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { Mic } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -61,8 +63,11 @@ export default function DashboardPage() {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button className="w-full" size="lg" disabled>
-              Start New Conversation (Coming Soon)
+            <Button className="w-full" size="lg" asChild>
+              <Link href="/conversation/new">
+                <Mic className="mr-2 h-4 w-4" />
+                Start New Conversation
+              </Link>
             </Button>
             <Button variant="outline" className="w-full" size="lg" disabled>
               View Past Conversations (Coming Soon)
