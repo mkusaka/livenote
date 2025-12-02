@@ -5,6 +5,7 @@ import Link from "next/link";
 import { RealtimeTranscriptionRecorder } from "@/components/realtime-transcription-recorder";
 import { GoogleSpeechRecorder } from "@/components/google-speech-recorder";
 import { AmiVoiceRecorder } from "@/components/amivoice-recorder";
+import { ElevenLabsRecorder } from "@/components/elevenlabs-recorder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
-type SpeechProvider = "openai" | "google" | "amivoice";
+type SpeechProvider = "openai" | "google" | "amivoice" | "elevenlabs";
 
 interface ExtractedTopic {
   title: string;
@@ -80,6 +81,7 @@ export default function NewConversationPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="amivoice">AmiVoice</SelectItem>
+              <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
               <SelectItem value="google">Google Cloud Speech-to-Text</SelectItem>
               <SelectItem value="openai">OpenAI Realtime API</SelectItem>
             </SelectContent>
@@ -90,6 +92,8 @@ export default function NewConversationPage() {
           <div className="space-y-6">
             {provider === "amivoice" ? (
               <AmiVoiceRecorder onTranscriptChange={setTranscript} />
+            ) : provider === "elevenlabs" ? (
+              <ElevenLabsRecorder onTranscriptChange={setTranscript} />
             ) : provider === "google" ? (
               <GoogleSpeechRecorder onTranscriptChange={setTranscript} />
             ) : (
