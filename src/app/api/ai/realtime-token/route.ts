@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 
 /**
- * Generate an ephemeral token for OpenAI Realtime API
+ * Generate an ephemeral token for OpenAI Realtime API (Transcription mode)
  * This allows the browser to connect directly to OpenAI without exposing the API key
+ *
+ * Uses the transcription_sessions endpoint for speech-to-text only
+ * @see https://platform.openai.com/docs/api-reference/realtime-beta-sessions
  */
 export async function POST() {
   try {
+    // Use the transcription-specific endpoint
     const response = await fetch(
-      "https://api.openai.com/v1/realtime/sessions",
+      "https://api.openai.com/v1/realtime/transcription_sessions",
       {
         method: "POST",
         headers: {
@@ -15,7 +19,18 @@ export async function POST() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini-realtime-preview",
+          input_audio_format: "pcm16",
+          input_audio_transcription: {
+            model: "gpt-4o-mini-transcribe",
+            language: "ja",
+          },
+          input_audio_noise_reduction: {
+            type: "near_field",
+          },
+          turn_detection: {
+            type: "server_vad",
+            threshold: 0.5,
+          },
         }),
       }
     );

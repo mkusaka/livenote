@@ -20,7 +20,8 @@ interface UseRealtimeTranscriptionReturn {
   clearTranscript: () => void;
 }
 
-const REALTIME_URL = "wss://api.openai.com/v1/realtime?model=gpt-4o-mini-realtime-preview";
+// Use the transcription-specific endpoint with gpt-4o-transcribe model
+const REALTIME_URL = "wss://api.openai.com/v1/realtime?intent=transcription";
 const SAMPLE_RATE = 24000;
 
 export function useRealtimeTranscription(): UseRealtimeTranscriptionReturn {
@@ -84,26 +85,8 @@ export function useRealtimeTranscription(): UseRealtimeTranscriptionReturn {
       ws.onopen = async () => {
         setState("connected");
 
-        // Configure the session for transcription
-        ws.send(
-          JSON.stringify({
-            type: "session.update",
-            session: {
-              modalities: ["text", "audio"],
-              input_audio_format: "pcm16",
-              input_audio_transcription: {
-                model: "whisper-1",
-                language: "ja",
-              },
-              turn_detection: {
-                type: "server_vad",
-                threshold: 0.5,
-                prefix_padding_ms: 300,
-                silence_duration_ms: 500,
-              },
-            },
-          })
-        );
+        // Session is already configured via the transcription_sessions endpoint
+        // No need to send session.update - start capturing audio directly
 
         // Start capturing audio
         try {
@@ -157,11 +140,27 @@ export function useRealtimeTranscription(): UseRealtimeTranscriptionReturn {
 
       ws.onmessage = (event) => {
         const message = JSON.parse(event.data);
+        console.log("OpenAI Realtime message:", message.type, message);
 
         switch (message.type) {
+          case "session.created":
+          case "session.updated":
+            console.log("Session event:", message.type);
+            break;
+
+          case "input_audio_buffer.speech_started":
+            console.log("Speech started");
+            break;
+
+          case "input_audio_buffer.speech_stopped":
+            console.log("Speech stopped");
+            break;
+
           case "conversation.item.input_audio_transcription.delta":
             // Interim transcription
-            setInterimTranscript((prev) => prev + (message.delta || ""));
+            if (message.delta) {
+              setInterimTranscript((prev) => prev + message.delta);
+            }
             break;
 
           case "conversation.item.input_audio_transcription.completed":
